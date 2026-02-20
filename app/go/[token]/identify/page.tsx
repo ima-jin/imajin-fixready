@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Select } from '@/components/select';
@@ -17,7 +17,8 @@ const AGE_RANGES = [
   { value: '10+', label: 'More than 10 years' },
 ];
 
-export default function IdentifyPage({ params }: { params: { token: string } }) {
+export default function IdentifyPage() {
+  const params = useParams<{ token: string }>();
   const router = useRouter();
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');

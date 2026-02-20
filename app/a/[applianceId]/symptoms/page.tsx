@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 
-export default function SymptomsPage({ params }: { params: { applianceId: string } }) {
+export default function SymptomsPage() {
+  const params = useParams<{ applianceId: string }>();
   const router = useRouter();
   const [appliance, setAppliance] = useState<any>(null);
   const [symptoms, setSymptoms] = useState<any[]>([]);
@@ -13,6 +14,7 @@ export default function SymptomsPage({ params }: { params: { applianceId: string
 
   useEffect(() => {
     async function loadData() {
+      if (!params.applianceId) return;
       try {
         const applianceRes = await fetch(`/api/appliances/${params.applianceId}`);
         const applianceData = await applianceRes.json();

@@ -1,15 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 import { ApplianceCard } from '@/components/appliance-card';
 
-export default function RequestDetailPage({ params }: { params: { id: string } }) {
+export default function RequestDetailPage() {
+  const params = useParams<{ id: string }>();
   const [request, setRequest] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadRequest() {
+      if (!params.id) return;
       try {
         const response = await fetch(`/api/requests/${params.id}`);
         const data = await response.json();

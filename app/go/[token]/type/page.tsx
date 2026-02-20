@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 
 const APPLIANCE_TYPES = [
@@ -14,7 +14,8 @@ const APPLIANCE_TYPES = [
   { value: 'other', label: 'Other', icon: '🔧' },
 ];
 
-export default function SelectTypePage({ params }: { params: { token: string } }) {
+export default function SelectTypePage() {
+  const params = useParams<{ token: string }>();
   const router = useRouter();
   const [selectedType, setSelectedType] = useState<string>('');
 

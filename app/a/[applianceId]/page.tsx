@@ -1,17 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 import { ApplianceCard } from '@/components/appliance-card';
 
-export default function RecognizedPage({ params }: { params: { applianceId: string } }) {
+export default function RecognizedPage() {
+  const params = useParams<{ applianceId: string }>();
   const router = useRouter();
   const [appliance, setAppliance] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadAppliance() {
+      if (!params.applianceId) return;
       try {
         const response = await fetch(`/api/appliances/${params.applianceId}`);
         if (!response.ok) {

@@ -1,16 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 
-export default function SubmittedPage({ params }: { params: { applianceId: string } }) {
+export default function SubmittedPage() {
+  const params = useParams<{ applianceId: string }>();
   const searchParams = useSearchParams();
   const requestId = searchParams.get('requestId');
   const [partner, setPartner] = useState<any>(null);
 
   useEffect(() => {
     async function loadPartner() {
+      if (!params.applianceId) return;
       try {
         const applianceRes = await fetch(`/api/appliances/${params.applianceId}`);
         const appliance = await applianceRes.json();

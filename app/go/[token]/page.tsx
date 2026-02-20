@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 
 interface Partner {
@@ -10,7 +10,8 @@ interface Partner {
   logoUrl: string | null;
 }
 
-export default function LandingPage({ params }: { params: { token: string } }) {
+export default function LandingPage() {
+  const params = useParams<{ token: string }>();
   const router = useRouter();
   const [partner, setPartner] = useState<Partner | null>(null);
   const [loading, setLoading] = useState(true);
@@ -18,6 +19,7 @@ export default function LandingPage({ params }: { params: { token: string } }) {
 
   useEffect(() => {
     async function validateToken() {
+      if (!params.token) return;
       try {
         const response = await fetch(`/api/token/${params.token}`);
 

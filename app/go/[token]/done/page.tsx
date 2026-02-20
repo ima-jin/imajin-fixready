@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 import { ApplianceCard } from '@/components/appliance-card';
 
-export default function DonePage({ params }: { params: { token: string } }) {
+export default function DonePage() {
+  const params = useParams<{ token: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
   const applianceId = searchParams.get('applianceId');

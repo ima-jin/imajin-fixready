@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Select } from '@/components/select';
 import { Textarea } from '@/components/textarea';
 
-export default function DetailsPage({ params }: { params: { applianceId: string } }) {
+export default function DetailsPage() {
+  const params = useParams<{ applianceId: string }>();
   const router = useRouter();
   const [errorCode, setErrorCode] = useState('');
   const [details, setDetails] = useState<Record<string, string>>({});

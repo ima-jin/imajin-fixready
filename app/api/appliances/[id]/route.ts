@@ -5,11 +5,12 @@ import { eq } from 'drizzle-orm';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const appliance = await db.query.appliances.findFirst({
-      where: eq(appliances.id, params.id),
+      where: eq(appliances.id, id),
     });
 
     if (!appliance) {

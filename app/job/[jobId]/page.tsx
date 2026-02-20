@@ -1,14 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { ApplianceCard } from '@/components/appliance-card';
 
-export default function TechJobPage({ params }: { params: { jobId: string } }) {
+export default function TechJobPage() {
+  const params = useParams<{ jobId: string }>();
   const [request, setRequest] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadJob() {
+      if (!params.jobId) return;
       try {
         // In production, this would fetch from /api/jobs/{jobId}
         // For MVP, we'll use request ID directly

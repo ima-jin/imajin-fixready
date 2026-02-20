@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Select } from '@/components/select';
@@ -14,7 +14,8 @@ const ROOMS = [
   { value: 'Other', label: 'Other' },
 ];
 
-export default function LocationPage({ params }: { params: { token: string } }) {
+export default function LocationPage() {
+  const params = useParams<{ token: string }>();
   const router = useRouter();
   const [address, setAddress] = useState('');
   const [unit, setUnit] = useState('');
@@ -26,6 +27,7 @@ export default function LocationPage({ params }: { params: { token: string } }) 
 
   useEffect(() => {
     async function loadPartner() {
+      if (!params.token) return;
       const response = await fetch(`/api/token/${params.token}`);
       const data = await response.json();
       setPartnerData(data);
