@@ -26,6 +26,12 @@ export default function AdminLayout({
               >
                 QR Codes
               </a>
+              <a
+                href="/admin/routes"
+                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Routes
+              </a>
             </div>
           </div>
         </div>
