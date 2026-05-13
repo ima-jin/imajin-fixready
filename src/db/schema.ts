@@ -72,7 +72,6 @@ export const appliances = pgTable('appliances', {
   locationIdx: index('idx_appliances_location').on(table.locationId),
   ownerDidIdx: index('idx_appliances_owner_did').on(table.ownerDid),
   applianceDidIdx: index('idx_appliances_appliance_did').on(table.applianceDid),
-  locationIdx: index('idx_appliances_location').on(table.locationId),
 }));
 
 // Service Requests
