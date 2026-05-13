@@ -12,16 +12,13 @@ export async function POST(request: NextRequest) {
       id: generateId('appliance'),
       partnerId: body.partnerId,
       tokenId: body.tokenId,
+      locationId: body.locationId,
       type: body.type,
       brand: body.brand || null,
       model: body.model || null,
       serial: body.serial || null,
       ageRange: body.ageRange || null,
-      address: body.address,
-      unit: body.unit || null,
       room: body.room || null,
-      contactPhone: body.contactPhone || null,
-      contactEmail: body.contactEmail || null,
     };
 
     const [appliance] = await db.insert(appliances).values(newAppliance).returning();
@@ -40,11 +37,16 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const partnerId = searchParams.get('partnerId');
+    const tokenId = searchParams.get('tokenId');
 
-    let query = db.select().from(appliances);
+    let query = db.select().from(appliances) as any;
 
     if (partnerId) {
-      query = query.where(eq(appliances.partnerId, partnerId)) as any;
+      query = query.where(eq(appliances.partnerId, partnerId));
+    }
+
+    if (tokenId) {
+      query = query.where(eq(appliances.tokenId, tokenId));
     }
 
     const results = await query;

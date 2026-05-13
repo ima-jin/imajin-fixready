@@ -4,88 +4,76 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
 import { Input } from '@/components/input';
-import { Select } from '@/components/select';
-
-const ROOMS = [
-  { value: 'Kitchen', label: 'Kitchen' },
-  { value: 'Laundry', label: 'Laundry Room' },
-  { value: 'Basement', label: 'Basement' },
-  { value: 'Garage', label: 'Garage' },
-  { value: 'Other', label: 'Other' },
-];
 
 export default function LocationPage() {
   const params = useParams<{ token: string }>();
   const router = useRouter();
   const [address, setAddress] = useState('');
   const [unit, setUnit] = useState('');
-  const [room, setRoom] = useState('');
-  const [contactPhone, setContactPhone] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
+  const [city, setCity] = useState('');
+  const [province, setProvince] = useState('');
+  const [postalCode, setPostalCode] = useState('');
   const [saving, setSaving] = useState(false);
-  const [partnerData, setPartnerData] = useState<any>(null);
 
   useEffect(() => {
-    async function loadPartner() {
+    async function checkExistingLocation() {
       if (!params.token) return;
-      const response = await fetch(`/api/token/${params.token}`);
-      const data = await response.json();
-      setPartnerData(data);
+      const response = await fetch(`/api/locations?tokenId=${params.token}`);
+      if (response.ok) {
+        const location = await response.json();
+        if (location?.id) {
+          sessionStorage.setItem('location_id', location.id);
+          router.push(`/go/${params.token}/type`);
+        }
+      }
     }
-    loadPartner();
-  }, [params.token]);
+    checkExistingLocation();
+  }, [params.token, router]);
 
   const handleSave = async () => {
     setSaving(true);
 
     try {
-      const applianceData = {
-        partnerId: partnerData?.partner?.id,
-        tokenId: params.token,
-        type: sessionStorage.getItem('appliance_type'),
-        brand: sessionStorage.getItem('appliance_brand'),
-        model: sessionStorage.getItem('appliance_model'),
-        serial: sessionStorage.getItem('appliance_serial') || null,
-        ageRange: sessionStorage.getItem('appliance_age_range'),
-        address,
-        unit: unit || null,
-        room,
-        contactPhone: contactPhone || null,
-        contactEmail: contactEmail || null,
-      };
-
-      const response = await fetch('/api/appliances', {
+      const response = await fetch('/api/locations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(applianceData),
+        body: JSON.stringify({
+          tokenId: params.token,
+          address,
+          unit: unit || null,
+          city: city || null,
+          province: province || null,
+          postalCode: postalCode || null,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save appliance');
+        throw new Error('Failed to save location');
       }
 
-      const appliance = await response.json();
+      const location = await response.json();
+      sessionStorage.setItem('location_id', location.id);
 
-      // Clear session storage
-      sessionStorage.clear();
-
-      router.push(`/go/${params.token}/done?applianceId=${appliance.id}`);
+      router.push(`/go/${params.token}/type`);
     } catch (error) {
-      console.error('Error saving appliance:', error);
-      alert('Failed to save appliance. Please try again.');
+      console.error('Error saving location:', error);
+      alert('Failed to save location. Please try again.');
     } finally {
       setSaving(false);
     }
   };
 
-  const canSave = address && room && (contactPhone || contactEmail);
+  const canSave = address.trim().length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-md mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">
-          Location & Contact
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          Property Address
         </h1>
+        <p className="text-gray-600 mb-6">
+          This address will be used for all appliances at this location.
+        </p>
 
         <div className="space-y-4 mb-6">
           <Input
@@ -93,7 +81,7 @@ export default function LocationPage() {
             required
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            placeholder="123 Main St, City, State ZIP"
+            placeholder="123 Main St"
           />
 
           <Input
@@ -103,37 +91,26 @@ export default function LocationPage() {
             placeholder="Apt 4B"
           />
 
-          <Select
-            label="Room / Location"
-            required
-            value={room}
-            onChange={(e) => setRoom(e.target.value)}
-            options={ROOMS}
+          <Input
+            label="City"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="Toronto"
           />
 
-          <div className="border-t pt-4">
-            <p className="text-sm text-gray-600 mb-3">
-              Preferred contact method (at least one required)
-            </p>
+          <Input
+            label="Province / State"
+            value={province}
+            onChange={(e) => setProvince(e.target.value)}
+            placeholder="Ontario"
+          />
 
-            <Input
-              label="Phone"
-              type="tel"
-              value={contactPhone}
-              onChange={(e) => setContactPhone(e.target.value)}
-              placeholder="(555) 123-4567"
-            />
-
-            <div className="my-3 text-center text-sm text-gray-500">or</div>
-
-            <Input
-              label="Email"
-              type="email"
-              value={contactEmail}
-              onChange={(e) => setContactEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
-          </div>
+          <Input
+            label="Postal / ZIP Code"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+            placeholder="M5V 1A1"
+          />
         </div>
 
         <Button
@@ -141,7 +118,7 @@ export default function LocationPage() {
           onClick={handleSave}
           disabled={!canSave || saving}
         >
-          {saving ? 'Saving...' : 'Save Appliance'}
+          {saving ? 'Saving...' : 'Continue'}
         </Button>
       </div>
     </div>

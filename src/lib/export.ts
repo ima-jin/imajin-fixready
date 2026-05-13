@@ -1,15 +1,16 @@
-import type { ServiceRequest, Appliance, Partner } from '@/db/schema';
+import type { ServiceRequest, Appliance, Partner, Location } from '@/db/schema';
 import type { Symptom } from './symptoms';
 
 export interface JobSummaryData {
   request: ServiceRequest;
   appliance: Appliance;
+  location: Location | null;
   partner: Partner;
   symptom: Symptom | null;
 }
 
 export function formatJobSummaryEmail(data: JobSummaryData): { subject: string; body: string } {
-  const { request, appliance, partner, symptom } = data;
+  const { request, appliance, location, partner, symptom } = data;
 
   const subject = `New Service Request: ${appliance.type} - ${appliance.brand || 'Unknown'} ${appliance.model || ''}`;
 
@@ -29,9 +30,11 @@ export function formatJobSummaryEmail(data: JobSummaryData): { subject: string; 
     ? `\nDetails:\n${Object.entries(request.symptomDetails).map(([key, value]) => `- ${key}: ${value}`).join('\n')}`
     : '';
 
-  const body = `Customer: ${appliance.contactPhone || appliance.contactEmail || 'No contact info'}
-Contact: ${appliance.contactPhone ? `(${appliance.contactPhone})` : appliance.contactEmail || 'N/A'}
-Address: ${appliance.address}${appliance.unit ? `, ${appliance.unit}` : ''}
+  const addressLine = location
+    ? `${location.address}${location.unit ? `, ${location.unit}` : ''}`
+    : 'Address not available';
+
+  const body = `Location: ${addressLine}
 
 APPLIANCE
 Type: ${appliance.type}
@@ -39,7 +42,7 @@ Brand: ${appliance.brand || 'Unknown'}
 Model: ${appliance.model || 'N/A'}
 Serial: ${appliance.serial || 'N/A'}
 Age: ${appliance.ageRange || 'Unknown'}
-Location: ${appliance.room || 'Not specified'}
+Room: ${appliance.room || 'Not specified'}
 
 ISSUE
 Category: ${symptom?.label || request.symptomCategory}
@@ -54,18 +57,14 @@ Partner: ${partner.name}`;
 }
 
 export function formatJobSummaryWebhook(data: JobSummaryData): Record<string, unknown> {
-  const { request, appliance, partner, symptom } = data;
+  const { request, appliance, location, partner, symptom } = data;
 
   return {
     event: 'service_request.created',
     request_id: request.id,
-    customer: {
-      phone: appliance.contactPhone || null,
-      email: appliance.contactEmail || null,
-    },
     address: {
-      full: `${appliance.address}${appliance.unit ? `, ${appliance.unit}` : ''}`,
-      unit: appliance.unit || null,
+      full: location ? `${location.address}${location.unit ? `, ${location.unit}` : ''}` : null,
+      unit: location?.unit || null,
       room: appliance.room || null,
     },
     appliance: {
@@ -87,6 +86,10 @@ export function formatJobSummaryWebhook(data: JobSummaryData): Record<string, un
     suggested_causes: request.suggestedCauses || [],
     confidence: request.confidence || 'medium',
     created_at: request.createdAt?.toISOString(),
+    partner: {
+      id: partner.id,
+      name: partner.name,
+    },
   };
 }
 

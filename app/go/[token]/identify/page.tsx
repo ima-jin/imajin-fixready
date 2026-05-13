@@ -31,7 +31,7 @@ export default function IdentifyPage() {
     sessionStorage.setItem('appliance_model', model);
     sessionStorage.setItem('appliance_serial', serial);
     sessionStorage.setItem('appliance_age_range', ageRange);
-    router.push(`/go/${params.token}/location`);
+    router.push(`/go/${params.token}/room`);
   };
 
   const canContinue = brand && model && ageRange;

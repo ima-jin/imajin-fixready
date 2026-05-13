@@ -2,10 +2,14 @@ import type { Appliance } from '@/db/schema';
 
 interface ApplianceCardProps {
   appliance: Appliance;
+  location?: {
+    address: string;
+    unit?: string | null;
+  } | null;
   className?: string;
 }
 
-export function ApplianceCard({ appliance, className = '' }: ApplianceCardProps) {
+export function ApplianceCard({ appliance, location, className = '' }: ApplianceCardProps) {
   return (
     <div className={`bg-white rounded-lg border-2 border-gray-200 p-4 ${className}`}>
       <div className="flex items-start gap-3">
@@ -25,13 +29,15 @@ export function ApplianceCard({ appliance, className = '' }: ApplianceCardProps)
         </div>
       </div>
       <div className="mt-3 pt-3 border-t border-gray-100">
-        <div className="text-sm text-gray-600">
-          📍 {appliance.address}
-          {appliance.unit && ` - ${appliance.unit}`}
-        </div>
+        {location && (
+          <div className="text-sm text-gray-600 mb-1">
+            📍 {location.address}
+            {location.unit && ` - ${location.unit}`}
+          </div>
+        )}
         {appliance.room && (
-          <div className="text-xs text-gray-500 mt-1">
-            Location: {appliance.room}
+          <div className="text-xs text-gray-500">
+            Room: {appliance.room}
           </div>
         )}
       </div>

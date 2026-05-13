@@ -79,7 +79,7 @@ export default function RequestDetailPage() {
             Appliance Information
           </h2>
           {request.appliance && (
-            <ApplianceCard appliance={request.appliance} />
+            <ApplianceCard appliance={request.appliance} location={request.appliance.location} />
           )}
         </div>
 

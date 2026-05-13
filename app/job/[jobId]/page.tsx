@@ -41,11 +41,14 @@ export default function TechJobPage() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Job Not Found</h1>
-          <p className="text-gray-600">This job doesn't exist or has been removed.</p>
+          <p className="text-gray-600">This job doesn&apos;t exist or has been removed.</p>
         </div>
       </div>
     );
   }
+
+  const location = request.appliance?.location;
+  const primaryContact = request.contacts?.[0];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -63,27 +66,37 @@ export default function TechJobPage() {
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="font-semibold text-gray-900 mb-3">Customer Contact</h2>
           <div className="space-y-2 text-sm">
-            {request.appliance?.contactPhone && (
+            {primaryContact?.name && (
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500">👤</span>
+                <span className="font-medium">{primaryContact.name}</span>
+                <span className="text-xs text-gray-400 capitalize">({primaryContact.role})</span>
+              </div>
+            )}
+            {primaryContact?.phone && (
               <div className="flex items-center gap-2">
                 <span className="text-gray-500">📞</span>
                 <a
-                  href={`tel:${request.appliance.contactPhone}`}
+                  href={`tel:${primaryContact.phone}`}
                   className="text-blue-600 font-medium"
                 >
-                  {request.appliance.contactPhone}
+                  {primaryContact.phone}
                 </a>
               </div>
             )}
-            {request.appliance?.contactEmail && (
+            {primaryContact?.email && (
               <div className="flex items-center gap-2">
                 <span className="text-gray-500">✉️</span>
                 <a
-                  href={`mailto:${request.appliance.contactEmail}`}
+                  href={`mailto:${primaryContact.email}`}
                   className="text-blue-600"
                 >
-                  {request.appliance.contactEmail}
+                  {primaryContact.email}
                 </a>
               </div>
+            )}
+            {!primaryContact && (
+              <div className="text-gray-500">No contact info available</div>
             )}
           </div>
         </div>
@@ -92,9 +105,18 @@ export default function TechJobPage() {
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="font-semibold text-gray-900 mb-3">Location</h2>
           <div className="text-sm text-gray-700">
-            <div className="font-medium">{request.appliance?.address}</div>
-            {request.appliance?.unit && (
-              <div className="text-gray-500">Unit: {request.appliance.unit}</div>
+            {location ? (
+              <>
+                <div className="font-medium">{location.address}</div>
+                {location.unit && (
+                  <div className="text-gray-500">Unit: {location.unit}</div>
+                )}
+                {location.city && location.province && (
+                  <div className="text-gray-500">{location.city}, {location.province} {location.postalCode}</div>
+                )}
+              </>
+            ) : (
+              <div className="text-gray-500">Address not available</div>
             )}
             {request.appliance?.room && (
               <div className="text-gray-500 mt-1">
