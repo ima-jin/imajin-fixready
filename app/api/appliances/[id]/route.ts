@@ -11,6 +11,9 @@ export async function GET(
     const { id } = await params;
     const appliance = await db.query.appliances.findFirst({
       where: eq(appliances.id, id),
+      with: {
+        location: true,
+      },
     });
 
     if (!appliance) {

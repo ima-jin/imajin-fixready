@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { serviceRequests } from '@/db/schema';
+import { serviceRequests, contacts } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function GET(
@@ -12,7 +12,11 @@ export async function GET(
     const serviceRequest = await db.query.serviceRequests.findFirst({
       where: eq(serviceRequests.id, id),
       with: {
-        appliance: true,
+        appliance: {
+          with: {
+            location: true,
+          },
+        },
       },
     });
 
@@ -23,7 +27,19 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(serviceRequest);
+    // Fetch contacts for this token if appliance has one
+    let tokenContacts: typeof contacts.$inferSelect[] = [];
+    if (serviceRequest.appliance?.tokenId) {
+      tokenContacts = await db
+        .select()
+        .from(contacts)
+        .where(eq(contacts.tokenId, serviceRequest.appliance.tokenId));
+    }
+
+    return NextResponse.json({
+      ...serviceRequest,
+      contacts: tokenContacts,
+    });
   } catch (error) {
     console.error('Error fetching service request:', error);
     return NextResponse.json(

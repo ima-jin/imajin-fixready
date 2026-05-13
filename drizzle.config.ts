@@ -7,5 +7,5 @@ export default {
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
-  tablesFilter: ['partners', 'registration_tokens', 'appliances', 'service_requests', 'jobs'],
+  tablesFilter: ['partners', 'registration_tokens', 'locations', 'contacts', 'appliances', 'service_requests', 'jobs'],
 } satisfies Config;

@@ -47,12 +47,14 @@ export default function RecognizedPage() {
             Appliance Not Found
           </h1>
           <p className="text-gray-600">
-            This appliance hasn't been registered yet. Please register it first.
+            This appliance hasn&apos;t been registered yet. Please register it first.
           </p>
         </div>
       </div>
     );
   }
+
+  const location = appliance.location;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -61,15 +63,15 @@ export default function RecognizedPage() {
           Appliance Recognized
         </h1>
 
-        <ApplianceCard appliance={appliance} className="mb-6" />
+        <ApplianceCard appliance={appliance} location={location} className="mb-6" />
 
         <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
           <p className="text-sm text-gray-600 mb-2">
             Is this still at:
           </p>
           <p className="font-medium text-gray-900">
-            {appliance.address}
-            {appliance.unit && ` - ${appliance.unit}`}
+            {location?.address || 'Unknown address'}
+            {location?.unit && ` - ${location.unit}`}
           </p>
         </div>
 
@@ -77,7 +79,7 @@ export default function RecognizedPage() {
           fullWidth
           onClick={() => router.push(`/a/${params.applianceId}/symptoms`)}
         >
-          What's going wrong?
+          What&apos;s going wrong?
         </Button>
       </div>
     </div>
