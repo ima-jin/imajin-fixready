@@ -62,11 +62,17 @@ export const appliances = pgTable('appliances', {
   serial: text('serial'),
   ageRange: text('age_range'),
   room: text('room'),
+  contactPhone: text('contact_phone'),
+  contactEmail: text('contact_email'),
+  ownerDid: text('owner_did'),       // nullable — anonymous appliances have no owner
+  applianceDid: text('appliance_did'), // nullable — populated when DID registration is wired in Phase 2
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 }, (table) => ({
   partnerIdx: index('idx_appliances_partner').on(table.partnerId),
   tokenIdx: index('idx_appliances_token').on(table.tokenId),
+  ownerDidIdx: index('idx_appliances_owner_did').on(table.ownerDid),
+  applianceDidIdx: index('idx_appliances_appliance_did').on(table.applianceDid),
   locationIdx: index('idx_appliances_location').on(table.locationId),
 }));
 
