@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Appliance } from '@/db/schema';
 
 interface ApplianceCardProps {
@@ -7,11 +8,12 @@ interface ApplianceCardProps {
     unit?: string | null;
   } | null;
   className?: string;
+  href?: string;
 }
 
-export function ApplianceCard({ appliance, location, className = '' }: ApplianceCardProps) {
-  return (
-    <div className={`bg-white rounded-lg border-2 border-gray-200 p-4 ${className}`}>
+export function ApplianceCard({ appliance, location, className = '', href }: ApplianceCardProps) {
+  const content = (
+    <div className={`bg-white rounded-lg border-2 border-gray-200 p-4 transition-all ${className}`}>
       <div className="flex items-start gap-3">
         <div className="flex-1">
           <div className="text-sm text-gray-500 uppercase tracking-wide">
@@ -43,4 +45,17 @@ export function ApplianceCard({ appliance, location, className = '' }: Appliance
       </div>
     </div>
   );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className="block rounded-lg transition-all hover:border-blue-400 active:scale-[0.98] [&>div]:hover:border-blue-400 [&>div]:active:scale-[0.99]"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return content;
 }

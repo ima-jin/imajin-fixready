@@ -138,7 +138,7 @@ export default function LandingPage() {
 
               <div className="space-y-3 mb-6">
                 {appliances.map((appliance) => (
-                  <ApplianceCard key={appliance.id} appliance={appliance} location={data.location} />
+                  <ApplianceCard key={appliance.id} appliance={appliance} location={data.location} href={`/a/${appliance.id}`} />
                 ))}
               </div>
 
