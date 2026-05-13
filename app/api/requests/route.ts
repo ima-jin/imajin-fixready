@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { serviceRequests, appliances, partners, type NewServiceRequest } from '@/db/schema';
+import { serviceRequests, appliances, partners, locations, contacts, type NewServiceRequest } from '@/db/schema';
 import { generateId } from '@/lib/utils';
 import { getSymptomById } from '@/lib/symptoms';
 import { logJobSummary } from '@/lib/export';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,9 +33,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (appliance) {
-      const partner = await db.query.partners.findFirst({
-        where: eq(partners.id, appliance.partnerId),
-      });
+      const [partner, location] = await Promise.all([
+        db.query.partners.findFirst({
+          where: eq(partners.id, appliance.partnerId),
+        }),
+        db.query.locations.findFirst({
+          where: eq(locations.id, appliance.locationId),
+        }),
+      ]);
 
       if (partner) {
         const symptom = getSymptomById(appliance.type, body.symptomCategory);
@@ -44,6 +49,7 @@ export async function POST(request: NextRequest) {
         logJobSummary({
           request: serviceRequest,
           appliance,
+          location: location || null,
           partner,
           symptom,
         });
@@ -68,9 +74,13 @@ export async function GET(request: NextRequest) {
 
     const results = await db.query.serviceRequests.findMany({
       with: {
-        appliance: true,
+        appliance: {
+          with: {
+            location: true,
+          },
+        },
       },
-      orderBy: (requests, { desc }) => [desc(requests.createdAt)],
+      orderBy: [desc(serviceRequests.createdAt)],
     });
 
     return NextResponse.json(results);

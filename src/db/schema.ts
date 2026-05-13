@@ -25,26 +25,49 @@ export const registrationTokens = pgTable('registration_tokens', {
   expiresAt: timestamp('expires_at'),
 });
 
+// Locations — physical address tied to a token
+export const locations = pgTable('locations', {
+  id: text('id').primaryKey(),
+  tokenId: text('token_id').references(() => registrationTokens.id).notNull().unique(),
+  address: text('address').notNull(),
+  unit: text('unit'),
+  city: text('city'),
+  province: text('province'),
+  postalCode: text('postal_code'),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Contacts — people associated with a token/location
+export const contacts = pgTable('contacts', {
+  id: text('id').primaryKey(),
+  tokenId: text('token_id').references(() => registrationTokens.id).notNull(),
+  name: text('name'),
+  phone: text('phone'),
+  email: text('email'),
+  role: text('role').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  tokenIdx: index('idx_contacts_token').on(table.tokenId),
+}));
+
 // Appliances
 export const appliances = pgTable('appliances', {
   id: text('id').primaryKey(),
   partnerId: text('partner_id').references(() => partners.id).notNull(),
   tokenId: text('token_id').references(() => registrationTokens.id),
+  locationId: text('location_id').references(() => locations.id).notNull(),
   type: text('type').notNull(),
   brand: text('brand'),
   model: text('model'),
   serial: text('serial'),
   ageRange: text('age_range'),
-  address: text('address').notNull(),
-  unit: text('unit'),
   room: text('room'),
-  contactPhone: text('contact_phone'),
-  contactEmail: text('contact_email'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 }, (table) => ({
   partnerIdx: index('idx_appliances_partner').on(table.partnerId),
   tokenIdx: index('idx_appliances_token').on(table.tokenId),
+  locationIdx: index('idx_appliances_location').on(table.locationId),
 }));
 
 // Service Requests
@@ -89,10 +112,31 @@ export const partnersRelations = relations(partners, ({ many }) => ({
   appliances: many(appliances),
 }));
 
-export const registrationTokensRelations = relations(registrationTokens, ({ one }) => ({
+export const registrationTokensRelations = relations(registrationTokens, ({ one, many }) => ({
   partner: one(partners, {
     fields: [registrationTokens.partnerId],
     references: [partners.id],
+  }),
+  location: one(locations, {
+    fields: [registrationTokens.id],
+    references: [locations.tokenId],
+  }),
+  contacts: many(contacts),
+  appliances: many(appliances),
+}));
+
+export const locationsRelations = relations(locations, ({ one, many }) => ({
+  token: one(registrationTokens, {
+    fields: [locations.tokenId],
+    references: [registrationTokens.id],
+  }),
+  appliances: many(appliances),
+}));
+
+export const contactsRelations = relations(contacts, ({ one }) => ({
+  token: one(registrationTokens, {
+    fields: [contacts.tokenId],
+    references: [registrationTokens.id],
   }),
 }));
 
@@ -100,6 +144,14 @@ export const appliancesRelations = relations(appliances, ({ one, many }) => ({
   partner: one(partners, {
     fields: [appliances.partnerId],
     references: [partners.id],
+  }),
+  token: one(registrationTokens, {
+    fields: [appliances.tokenId],
+    references: [registrationTokens.id],
+  }),
+  location: one(locations, {
+    fields: [appliances.locationId],
+    references: [locations.id],
   }),
   requests: many(serviceRequests),
 }));
@@ -123,6 +175,10 @@ export type Partner = typeof partners.$inferSelect;
 export type NewPartner = typeof partners.$inferInsert;
 export type RegistrationToken = typeof registrationTokens.$inferSelect;
 export type NewRegistrationToken = typeof registrationTokens.$inferInsert;
+export type Location = typeof locations.$inferSelect;
+export type NewLocation = typeof locations.$inferInsert;
+export type Contact = typeof contacts.$inferSelect;
+export type NewContact = typeof contacts.$inferInsert;
 export type Appliance = typeof appliances.$inferSelect;
 export type NewAppliance = typeof appliances.$inferInsert;
 export type ServiceRequest = typeof serviceRequests.$inferSelect;

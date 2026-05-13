@@ -34,7 +34,7 @@ export default function DonePage() {
         </div>
 
         {appliance && (
-          <ApplianceCard appliance={appliance} className="mb-6" />
+          <ApplianceCard appliance={appliance} location={appliance.location} className="mb-6" />
         )}
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
