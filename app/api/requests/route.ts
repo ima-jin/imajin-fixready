@@ -73,6 +73,7 @@ export async function GET(request: NextRequest) {
     const applianceId = searchParams.get('applianceId');
 
     const results = await db.query.serviceRequests.findMany({
+      where: applianceId ? eq(serviceRequests.applianceId, applianceId) : undefined,
       with: {
         appliance: {
           with: {
