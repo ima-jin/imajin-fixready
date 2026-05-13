@@ -1,3 +1,5 @@
+import { ImajinAuth } from '@/components/ImajinAuth';
+
 export default function AdminLayout({
   children,
 }: {
@@ -32,6 +34,7 @@ export default function AdminLayout({
               >
                 Routes
               </a>
+              <ImajinAuth />
             </div>
           </div>
         </div>

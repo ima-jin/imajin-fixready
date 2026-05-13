@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/button';
+import { ImajinAuth } from '@/components/ImajinAuth';
 
 interface Partner {
   id: string;
@@ -62,6 +63,11 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      {/* Auth header — Tier 3 power user, non-blocking */}
+      <div className="flex justify-end px-4 pt-4">
+        <ImajinAuth />
+      </div>
+
       <div className="max-w-md mx-auto px-4 py-8">
         {/* Partner branding */}
         <div className="text-center mb-8">
